@@ -1,23 +1,32 @@
 package ru.gb.androidone.donspb.cinematron.view
 
+import android.Manifest
+import android.app.AlertDialog
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Geocoder
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import ru.gb.androidone.donspb.cinematron.Consts
 import ru.gb.androidone.donspb.cinematron.R
 import ru.gb.androidone.donspb.cinematron.databinding.MainFragmentBinding
+import ru.gb.androidone.donspb.cinematron.map.MapsFragment
 import ru.gb.androidone.donspb.cinematron.model.MovieListItem
 import ru.gb.androidone.donspb.cinematron.viewmodel.AppState
 import ru.gb.androidone.donspb.cinematron.viewmodel.LocalViewModel
 import ru.gb.androidone.donspb.cinematron.viewmodel.MainViewModel
 import ru.gb.androidone.donspb.cinematron.viewmodel.MovieListsEnum
-
-private const val RECENT_LIST_ID = 0
+import java.io.IOException
 
 class MainFragment : Fragment() {
 
@@ -67,8 +76,15 @@ class MainFragment : Fragment() {
             movieRecyclerTop.adapter = adapterTop
             movieRecyclerPop.adapter = adapterPop
             movieRecyclerUp.adapter = adapterUp
+            mainFragmentLocationFAB.setOnClickListener {
+                activity?.supportFragmentManager?.apply {
+                beginTransaction()
+                    .replace(R.id.main_container, MapsFragment.newInstance())
+                    .addToBackStack("")
+                    .commitAllowingStateLoss()
+                }
+            }
         }
-
 
         viewModelRecent.recentLiveData.observe(viewLifecycleOwner, Observer {
             renderData(it, R.string.recent_list)
@@ -138,6 +154,22 @@ class MainFragment : Fragment() {
     interface OnItemViewClickListener {
         fun onItemViewClick(movie: MovieListItem)
     }
+
+
+//    private fun showAddressDialog(address: String, location: Location) {
+//        activity?.let {
+//            AlertDialog.Builder(it)
+//                .setTitle(getString(R.string.dialog_address_title))
+//                .setMessage(address)
+//                .setNegativeButton(getString(R.string.dialog_button_close))
+//                { dialog, _ -> dialog.dismiss() }
+//                .setPositiveButton(getString(R.string.dialog_open_map))
+//                {
+//                }
+//                .create()
+//                .show()
+//        }
+//    }
 }
 
 private fun View.showSnackBar(
